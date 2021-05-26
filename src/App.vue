@@ -122,6 +122,11 @@ export default {
         this.selectedSeries = Series.fromJson(JSON.parse(new TextDecoder().decode(value)));
         this.page = this.CHAPTER_MANAGER_PAGE;
       })
+      .catch(() => {
+        this.fileName = name;
+        this.selectedSeries = new Series(name.replace('.json', ''));
+        this.page = this.CHAPTER_MANAGER_PAGE;
+      })
     },
     discardSeries() {
       this.page = this.SERIES_MANAGER_PAGE;

@@ -9,12 +9,12 @@ export default class Series {
   chapters;
 
   constructor(title, description, artist, author, cover, chapters) {
-    this.title = title;
-    this.description = description;
-    this.artist = artist;
-    this.author = author;
-    this.cover = cover;
-    this.chapters = chapters;
+    this.title = title ?? '';
+    this.description = description ?? '';
+    this.artist = artist ?? '';
+    this.author = author ?? '';
+    this.cover = cover ?? '';
+    this.chapters = chapters ?? {};
   }
 
   static fromJson(o) {
