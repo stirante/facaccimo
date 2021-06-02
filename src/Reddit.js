@@ -12,7 +12,7 @@ export default class Reddit {
     }).then(value => {
       let data = JSON.parse(value);
       return data[0].data.children[0].data.gallery_data.items.map(function (item) {
-        return "https://i.redd.it/" + item.media_id + ".png";
+        return "https://i.redd.it/" + item.media_id + "." + data[0].data.children[0].data.media_metadata[item.media_id].m.replace('image/', '');
       });
     });
   }
