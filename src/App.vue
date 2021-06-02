@@ -26,7 +26,7 @@
     <ChapterManager v-if="page === CHAPTER_MANAGER_PAGE" :name="fileName" :series="selectedSeries"
                     v-on:discard="discardSeries" v-on:save="saveSeries" v-on:chapter="goToChapter"/>
     <ChapterEditor v-if="page === CHAPTER_EDITOR_PAGE" :chapterKey="chapterKey" :chapter="chapter"
-                   v-on:discard="discardChapter" v-on:save="saveChapter"/>
+                   v-on:discard="discardChapter" v-on:save="saveChapter" v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
   </div>
 </template>
 
@@ -151,6 +151,13 @@ export default {
     saveChapter(key, chapter) {
       this.selectedSeries.chapters[key] = chapter;
       this.page = this.CHAPTER_MANAGER_PAGE;
+    },
+    displayLoader(msg) {
+      this.loading = true;
+      this.loadingStatus = msg;
+    },
+    finishLoader() {
+      this.loading = false;
     }
   },
   mounted() {

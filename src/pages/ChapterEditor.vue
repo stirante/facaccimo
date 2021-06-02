@@ -32,9 +32,12 @@
                 <b-field v-if="isImgur" label="Imgur album ID">
                   <b-input v-model="pages"></b-input>
                 </b-field>
-                <b-field v-else label="List of image URLs">
-                  <b-input v-model="pages" type="textarea"></b-input>
-                </b-field>
+                <div v-else>
+                  <b-field label="List of image URLs">
+                    <b-input v-model="pages" type="textarea"></b-input>
+                  </b-field>
+                  <b-button type="is-primary" @click="parseReddit">Parse Reddit post</b-button>
+                </div>
               </section>
             </div>
           </div>
@@ -49,6 +52,7 @@
 import {BButton} from "buefy/src/components/button";
 import Chapter from "@/model/Chapter";
 import Groups from "@/model/Groups";
+import Reddit from "@/Reddit";
 
 export default {
   name: 'ChapterEditor',
@@ -72,7 +76,19 @@ export default {
       this.chapter.setLastUpdated(new Date());
       this.chapter.groups = Groups.getGroups(this.groupName, this.pages, this.isImgur);
       this.$emit('save', this.chapterKey, this.chapter);
+    },
+    parseReddit() {
+      if (Reddit.isRedditUrl(this.pages)) {
+        this.$emit('loading', 'Getting data from Reddit');
+        Reddit.getImgArray(this.pages).then(value => {
+          this.pages = value.join('\n');
+          this.$emit('loaded');
+        });
+      } else {
+        this.$buefy.toast.open('URL is not a valid Reddit URL!')
+      }
     }
+
   },
   props: {
     chapter: Chapter,
