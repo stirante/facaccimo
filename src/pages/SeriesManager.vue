@@ -24,7 +24,7 @@
 
               <b-table-column field="last_chapter" label="Last Chapter" v-slot="props" sortable>
                 {{
-                  props.row.data.chapters[Object.keys(props.row.data.chapters)[Object.keys(props.row.data.chapters).length - 1]].title
+                  Object.keys(props.row.data.chapters).length !== 0 ? props.row.data.chapters[Object.keys(props.row.data.chapters)[Object.keys(props.row.data.chapters).length - 1]].title : 'N/A'
                 }}
               </b-table-column>
 

@@ -3,6 +3,9 @@ import * as git from "isomorphic-git"
 import * as http from "isomorphic-git/http/node"
 import LightningFS from "@isomorphic-git/lightning-fs"
 
+// Simple flag for testing
+const DRY_RUN = false;
+
 export default class GitHubUtils {
   static createGH(username, pat) {
     return new GitHub({
@@ -54,15 +57,21 @@ export default class GitHubUtils {
   }
 
   static push(promise, fs, username, pat) {
-    return promise
-      .then(() => {
-        return git.push({
-          fs: fs,
-          dir: '/',
-          http: http,
-          onAuth: () => ({username: username, password: pat})
+    if (DRY_RUN) {
+      return promise.then(() => {
+        console.log('Not pushing, because DRY_RUN');
+      })
+    } else {
+      return promise
+        .then(() => {
+          return git.push({
+            fs: fs,
+            dir: '/',
+            http: http,
+            onAuth: () => ({username: username, password: pat})
+          });
         });
-      });
+    }
   }
 
   static addSeries(name, series, username, pat, fs) {
@@ -91,6 +100,21 @@ export default class GitHubUtils {
             });
           }), fs, 'Delete ' + name),
       fs, username, pat);
+  }
+
+  static rename(oldName, newName, fs) {
+    return Promise.all([
+      git.remove({
+        fs: fs,
+        dir: '/',
+        filepath: oldName
+      }),
+      git.add({
+        fs: fs,
+        dir: '/',
+        filepath: newName
+      })
+    ]);
   }
 
   static getSeriesUrl(name, repo, fs) {

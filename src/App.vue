@@ -82,10 +82,12 @@ export default {
     },
     parseData() {
       this.series = [];
+      let noExt = [];
       this.fs.readdir('/', {}, (err, files) => {
+        let promises = [];
         files.forEach(file => {
           if (file.endsWith('.json')) {
-            this.fs.promises.readFile('/' + file, {}).then(data => {
+            promises.push(this.fs.promises.readFile('/' + file, {}).then(data => {
               this.loadingStatus = 'Parsing ' + file;
               try {
                 this.series.push({
@@ -99,12 +101,56 @@ export default {
                   duration: 5000
                 });
               }
-            })
+            }))
+          } else if (file.indexOf('.') === -1) {
+            promises.push(this.fs.promises.readFile('/' + file, {}).then(data => {
+              this.loadingStatus = 'Parsing ' + file;
+              try {
+                noExt.push({
+                  name: file,
+                  data: Series.fromJson(JSON.parse(new TextDecoder().decode(data)))
+                });
+              } catch {
+                // We only check whether those files potentially could be series
+              }
+            }))
           }
         });
-        this.loading = false;
+        return Promise.all(promises).then(() => {
+          this.loading = false;
+          if (noExt.length !== 0) {
+            this.$buefy.dialog.confirm({
+              title: 'Found potential series with no extension',
+              message: 'Found files without extension, that could be series. Do you want to rename them to include ".json" extension?<pre>' + noExt.map(value => value.name).join('\n') + '</pre>',
+              confirmText: 'Rename',
+              type: 'is-primary',
+              hasIcon: true,
+              onConfirm: () => this.renameChapters(noExt),
+              onCancel: () => this.page = this.SERIES_MANAGER_PAGE
+            });
+          } else {
+            this.page = this.SERIES_MANAGER_PAGE;
+          }
+        });
+      })
+    },
+    renameChapters(noExt) {
+      let target = this;
+      this.loadingStatus = "Renaming files";
+      this.loading = true;
+      let promises = [];
+      for (const item of noExt) {
+        promises.push(Promise.all([
+            this.fs.promises.rename('/' + item.name, '/' + item.name + '.json'),
+            GitHubUtils.rename(item.name, item.name + '.json', this.fs)
+        ]));
+        item.name = item.name + '.json'
+        this.series.push(item);
+      }
+      GitHubUtils.push(GitHubUtils.commit(Promise.all(promises), this.fs, 'Add .json extensions'), this.fs, this.username, this.pat).then(() => {
+        target.loading = false;
         this.page = this.SERIES_MANAGER_PAGE;
-      });
+      })
     },
     deleteSeries(fileName) {
       this.loadingStatus = 'Deleting ' + fileName;
