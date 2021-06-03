@@ -112,6 +112,9 @@ export default {
       })
     },
     goToSeries(name) {
+      if (!name.toLowerCase().endsWith('.json')) {
+        name = name + '.json';
+      }
       this.$emit('series', name);
     }
   },
