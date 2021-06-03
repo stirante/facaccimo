@@ -144,12 +144,17 @@ export default {
       } else if (this.step === 7 || this.step === 8) {
         if (this.step === 7) {
           let target = this;
+          this.$emit('loading', 'Creating repo');
           GitHubUtils.createRepo(this.username, this.pat, this.repoName).then(value1 => {
-            target.repoName = value1.full_name;
-          })
+            target.repoName = value1.data.full_name;
+            this.$emit('loaded');
+            this.step = 9;
+            this.actionType = this.ACTION_YES_NO;
+          });
+        } else {
+          this.step = 9;
+          this.actionType = this.ACTION_YES_NO;
         }
-        this.step = 9;
-        this.actionType = this.ACTION_YES_NO;
       } else if (this.step === 9) {
         if (value) {
           window.localStorage.setItem('pat', this.pat);

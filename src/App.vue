@@ -20,11 +20,11 @@
         <h2 class="subtitle">easy cubari.moe sources</h2>
       </div>
     </div>
-    <HomePage v-if="page === HOME_PAGE" v-on:finished="cloneRepo"/>
+    <HomePage v-if="page === HOME_PAGE" v-on:finished="cloneRepo" v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
     <SeriesManager ref="manager" v-if="page === SERIES_MANAGER_PAGE" :series="series" v-on:series="goToSeries"
-                   v-on:delete="deleteSeries" v-on:show="showUrl"/>
+                   v-on:delete="deleteSeries" v-on:show="showUrl" v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
     <ChapterManager v-if="page === CHAPTER_MANAGER_PAGE" :name="fileName" :series="selectedSeries"
-                    v-on:discard="discardSeries" v-on:save="saveSeries" v-on:chapter="goToChapter"/>
+                    v-on:discard="discardSeries" v-on:save="saveSeries" v-on:chapter="goToChapter" v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
     <ChapterEditor v-if="page === CHAPTER_EDITOR_PAGE" :chapterKey="chapterKey" :chapter="chapter"
                    v-on:discard="discardChapter" v-on:save="saveChapter" v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
   </div>
