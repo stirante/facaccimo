@@ -1,9 +1,9 @@
 export default class Reddit {
   static isRedditUrl(url) {
-    return /(?:https?:\/\/)?(?:www\.)?reddit\.com\/r\/[a-z]+\/comments\/[a-z0-9]+\/[a-z0-9_]+\/?/g.test(url);
+    return /(?:https?:\/\/)?(?:www\.)?reddit\.com\/r\/[a-z]+\/comments\/[a-z0-9]+\/[a-z0-9_]+\/?/g.test(url.toLowerCase());
   }
   static getImgArray(url) {
-    if (!url.startsWith('http')) {
+    if (!url.toLowerCase().startsWith('http')) {
       url = "https://" + url;
     }
     url = "https://cors.stirante.com/" + url + ".json";
