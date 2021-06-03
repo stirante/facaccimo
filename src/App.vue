@@ -71,14 +71,44 @@ export default {
       this.pat = data.pat;
       this.username = data.username;
       this.repoName = data.repoName;
+      this.email = data.email;
       let target = this;
-      target.loading = true;
-      target.loadingStatus = 'Cloning repo';
-      GitHubUtils.cloneRepo(this.repoName).then(value => {
-        target.fs = value;
-        target.loadingStatus = 'Parsing data';
-        target.parseData();
-      });
+      if (this.email === '') {
+        this.$buefy.dialog.prompt({
+          message: `Provide email address that will be associated with commits (usually the same as GitHub one)`,
+          inputAttrs: {
+            placeholder: 'user@example.org'
+          },
+          closeOnConfirm: false,
+          trapFocus: true,
+          canCancel: false,
+          onConfirm: (value, {close}) => {
+            const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (re.test(String(value).toLowerCase())) {
+              target.email = value;
+              window.localStorage.setItem('email', target.email);
+              close();
+              target.loading = true;
+              target.loadingStatus = 'Cloning repo';
+              GitHubUtils.cloneRepo(this.repoName).then(value => {
+                target.fs = value;
+                target.loadingStatus = 'Parsing data';
+                target.parseData();
+              });
+            } else {
+              this.$buefy.toast.open({message: 'Invalid email!', type: 'is-danger'});
+            }
+          }
+        })
+      } else {
+        target.loading = true;
+        target.loadingStatus = 'Cloning repo';
+        GitHubUtils.cloneRepo(this.repoName).then(value => {
+          target.fs = value;
+          target.loadingStatus = 'Parsing data';
+          target.parseData();
+        });
+      }
     },
     parseData() {
       this.series = [];
@@ -147,7 +177,7 @@ export default {
         item.name = item.name + '.json'
         this.series.push(item);
       }
-      GitHubUtils.push(GitHubUtils.commit(Promise.all(promises), this.fs, 'Add .json extensions'), this.fs, this.username, this.pat).then(() => {
+      GitHubUtils.push(GitHubUtils.commit(Promise.all(promises), this.fs, 'Add .json extensions', this.email), this.fs, this.username, this.pat).then(() => {
         target.loading = false;
         this.page = this.SERIES_MANAGER_PAGE;
       })
@@ -156,7 +186,7 @@ export default {
       this.loadingStatus = 'Deleting ' + fileName;
       this.loading = true;
       let target = this;
-      GitHubUtils.deleteSeries(fileName, this.username, this.pat, this.fs).then(() => {
+      GitHubUtils.deleteSeries(fileName, this.username, this.pat, this.fs, this.email).then(() => {
         target.parseData();
         target.loading = false;
         this.$buefy.toast.open('Series deleted!')
@@ -181,7 +211,7 @@ export default {
       this.loadingStatus = 'Saving ' + name;
       this.loading = true;
       let target = this;
-      GitHubUtils.addSeries(name, series, this.username, this.pat, this.fs).then(() => {
+      GitHubUtils.addSeries(name, series, this.username, this.pat, this.fs, this.email).then(() => {
         this.parseData();
         target.loading = false;
       });
@@ -215,6 +245,7 @@ export default {
       CHAPTER_MANAGER_PAGE: 'chapterManager',
       CHAPTER_EDITOR_PAGE: 'chapterEditor',
       page: 'home',
+      email: '',
       pat: '',
       username: '',
       repoName: '',

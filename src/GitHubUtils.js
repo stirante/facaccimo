@@ -19,6 +19,18 @@ export default class GitHubUtils {
     return gh.getUser().listRepos();
   }
 
+  static getEmail(username, pat) {
+    let gh = this.createGH(username, pat);
+    return gh.getUser().getEmails().then(value => {
+      for (const email of value.data) {
+        if (email.primary) {
+          return email.email;
+        }
+      }
+      return value.data[0].email;
+    });
+  }
+
   static createRepo(username, pat, repoName) {
     let gh = this.createGH(username, pat);
     return gh.getUser().createRepo({
@@ -41,7 +53,7 @@ export default class GitHubUtils {
       });
   }
 
-  static commit(promise, fs, message) {
+  static commit(promise, fs, message, email) {
     return promise
       .then(() => {
         return git.commit({
@@ -49,7 +61,7 @@ export default class GitHubUtils {
           dir: '/',
           author: {
             name: 'Facaccimo',
-            email: 'brzozowski.s.piotr@gmail.com'
+            email: email
           },
           message: message
         });
@@ -74,7 +86,7 @@ export default class GitHubUtils {
     }
   }
 
-  static addSeries(name, series, username, pat, fs) {
+  static addSeries(name, series, username, pat, fs, email) {
     return this.push(
       this.commit(
         fs.promises.writeFile('/' + name, JSON.stringify(series, null, 2))
@@ -84,11 +96,11 @@ export default class GitHubUtils {
               dir: '/',
               filepath: name
             })
-          }), fs, 'Update ' + name),
+          }), fs, 'Update ' + name, email),
       fs, username, pat);
   }
 
-  static deleteSeries(name, username, pat, fs) {
+  static deleteSeries(name, username, pat, fs, email) {
     return this.push(
       this.commit(
         fs.promises.unlink('/' + name, {})
@@ -98,7 +110,7 @@ export default class GitHubUtils {
               dir: '/',
               filepath: name
             });
-          }), fs, 'Delete ' + name),
+          }), fs, 'Delete ' + name, email),
       fs, username, pat);
   }
 
