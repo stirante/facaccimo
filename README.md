@@ -2,6 +2,8 @@
 
 A static web app for easy management of cubari.moe sources. 
 
+https://stirante.com/facaccimo/index.html
+
 ## Project setup
 ```
 npm install
