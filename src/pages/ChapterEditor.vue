@@ -83,9 +83,13 @@ export default {
         Reddit.getImgArray(this.pages).then(value => {
           this.pages = value.join('\n');
           this.$emit('loaded');
+        })
+        .catch(() => {
+          this.$emit('loaded');
+          this.$buefy.toast.open({message: 'Failed to parse Reddit URL! Please try again later.', type: 'is-danger'});
         });
       } else {
-        this.$buefy.toast.open('URL is not a valid Reddit URL!')
+        this.$buefy.toast.open({message: 'URL is not a valid Reddit URL!', type: 'is-warning'});
       }
     }
 
