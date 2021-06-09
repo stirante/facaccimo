@@ -50,8 +50,16 @@
             <div class="content">
               <div class="has-text-right">
                 <b-button type="is-primary"
+                          :disabled="checkedRows.length === 0"
+                          @click="groupEdit()"
+                          icon-pack="fas"
+                          class="m-1"
+                          icon-left="pen">Group edit volume
+                </b-button>
+                <b-button type="is-primary"
                           @click="addNewChapter()"
                           icon-pack="fas"
+                          class="m-1"
                           icon-left="plus">Add new chapter
                 </b-button>
               </div>
@@ -59,10 +67,13 @@
                        paginated
                        :per-page="10"
                        :current-page.sync="currentPage"
+                       :checked-rows.sync="checkedRows"
                        pagination-simple
                        default-sort="name"
                        icon-pack="fas"
                        hoverable
+                       checkable
+                       checkbox-position="left"
               >
 
                 <b-table-column field="name" label="Chapter number" v-slot="props" sortable>
@@ -98,6 +109,11 @@
                   <div class="has-text-centered">No chapters</div>
                 </template>
 
+                <template #footer>
+                  <div class="has-text-right">
+                  </div>
+                </template>
+
               </b-table>
             </div>
           </div>
@@ -124,10 +140,24 @@ export default {
   },
   data: function () {
     return {
-      currentPage: 1
+      currentPage: 1,
+      checkedRows: []
     }
   },
   methods: {
+    groupEdit() {
+      let target = this;
+      this.$buefy.dialog.prompt({
+        message: `Set the volume for selected chapters`,
+        trapFocus: true,
+        onConfirm: (value) => {
+          target.checkedRows.forEach(e => {
+            target.series.chapters[e].volume = value;
+          });
+          target.$buefy.toast.open('Volume set!');
+        }
+      })
+    },
     deleteChapter(number) {
       Vue.delete(this.series.chapters, number);
       // delete this.series.chapters[number];
