@@ -48,6 +48,13 @@
           </header>
           <div class="card-content">
             <div class="content">
+              <div class="has-text-right">
+                <b-button type="is-primary"
+                          @click="addNewChapter()"
+                          icon-pack="fas"
+                          icon-left="plus">Add new chapter
+                </b-button>
+              </div>
               <b-table :data="Object.keys(series.chapters)"
                        paginated
                        :per-page="10"
@@ -89,16 +96,6 @@
 
                 <template #empty>
                   <div class="has-text-centered">No chapters</div>
-                </template>
-
-                <template #footer>
-                  <div class="has-text-right">
-                    <b-button type="is-primary"
-                              @click="addNewChapter()"
-                              icon-pack="fas"
-                              icon-left="plus">Add new chapter
-                    </b-button>
-                  </div>
                 </template>
 
               </b-table>
