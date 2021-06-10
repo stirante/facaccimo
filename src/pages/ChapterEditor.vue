@@ -50,8 +50,25 @@
                 <b-field label="Title">
                   <b-input v-model="chapter.title"></b-input>
                 </b-field>
-                <b-field label="Volume">
-                  <b-input v-model="chapter.volume"></b-input>
+                <b-field grouped>
+                  <b-field label="Volume" expanded>
+                    <b-input v-model="chapter.volume"></b-input>
+                  </b-field>
+                  <b-field label="Last updated" expanded>
+                    <b-datetimepicker
+                        icon-pack="fas"
+                        icon="calendar"
+                        v-model="datetime"
+                        horizontal-time-picker>
+                      <template #left>
+                        <b-button
+                            label="Now"
+                            type="is-primary"
+                            icon-left="clock"
+                            @click="datetime = new Date()" />
+                      </template>
+                    </b-datetimepicker>
+                  </b-field>
                 </b-field>
                 <b-field label="Group name">
                   <b-input v-model="groupName"></b-input>
@@ -111,6 +128,7 @@ export default {
       isImgur: Groups.isImgur(this.chapter.groups),
       pages: Groups.getPages(this.chapter.groups),
       groupName: Groups.getGroupName(this.chapter.groups),
+      datetime: this.chapter.getLastUpdated(),
       isImporting: false,
       importType: null,
       importContent: ''
@@ -123,7 +141,7 @@ export default {
       this.$emit('discard');
     },
     save() {
-      this.chapter.setLastUpdated(new Date());
+      this.chapter.setLastUpdated(this.datetime);
       this.chapter.groups = Groups.getGroups(this.groupName, this.pages, this.isImgur);
       this.$emit('save', this.chapterKey, this.chapter);
     },

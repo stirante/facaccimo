@@ -182,7 +182,7 @@ export default {
         lastVolume = lastChapter.volume;
         lastGroup = Groups.getGroupName(lastChapter.groups);
       }
-      this.$emit('chapter', number, this.series.chapters[number] ?? new Chapter(number, lastVolume, new Date(), Groups.getImagesGroup(lastGroup, '')));
+      this.$emit('chapter', number, this.series.chapters[number] ?? new Chapter(number, lastVolume, null, Groups.getImagesGroup(lastGroup, '')));
     },
     addNewChapter() {
       let key = '';
