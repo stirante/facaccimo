@@ -20,13 +20,17 @@
         <h2 class="subtitle">easy cubari.moe sources</h2>
       </div>
     </div>
-    <HomePage v-if="page === HOME_PAGE" v-on:finished="cloneRepo" v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
+    <HomePage v-if="page === HOME_PAGE" v-on:finished="cloneRepo" v-on:loading="displayLoader"
+              v-on:loaded="finishLoader"/>
     <SeriesManager ref="manager" v-if="page === SERIES_MANAGER_PAGE" :series="series" v-on:series="goToSeries"
-                   v-on:delete="deleteSeries" v-on:show="showUrl" v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
+                   v-on:delete="deleteSeries" v-on:show="showUrl" v-on:loading="displayLoader"
+                   v-on:loaded="finishLoader"/>
     <ChapterManager v-if="page === CHAPTER_MANAGER_PAGE" :name="fileName" :series="selectedSeries"
-                    v-on:discard="discardSeries" v-on:save="saveSeries" v-on:chapter="goToChapter" v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
+                    v-on:discard="discardSeries" v-on:save="saveSeries" v-on:chapter="goToChapter"
+                    v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
     <ChapterEditor v-if="page === CHAPTER_EDITOR_PAGE" :chapterKey="chapterKey" :chapter="chapter"
-                   v-on:discard="discardChapter" v-on:save="saveChapter" v-on:loading="displayLoader" v-on:loaded="finishLoader"/>
+                   v-on:discard="discardChapter" v-on:save="saveChapter" v-on:loading="displayLoader"
+                   v-on:loaded="finishLoader"/>
   </div>
 </template>
 
@@ -161,6 +165,27 @@ export default {
           } else {
             this.page = this.SERIES_MANAGER_PAGE;
           }
+          if (!window.localStorage || !window.localStorage.getItem('skipTopics')) {
+            GitHubUtils.getTopics(this.repoName, this.username, this.pat).then(value => {
+              let names = value.data.names;
+              if (names.indexOf('cubari-source') === -1) {
+                this.$buefy.dialog.confirm({
+                  title: 'Add GitHub topic?',
+                  message: 'Do you want to add "cubari-source" topic to the repo, so that it will be possible to discover?',
+                  confirmText: 'Add',
+                  type: 'is-primary',
+                  hasIcon: true,
+                  onConfirm: () => {
+                    names.push('cubari-source');
+                    GitHubUtils.setTopics(names, this.repoName, this.username, this.pat);
+                  },
+                  onCancel: () => {
+                    window.localStorage.setItem('skipTopics', "1");
+                  }
+                });
+              }
+            })
+          }
         });
       })
     },
@@ -171,8 +196,8 @@ export default {
       let promises = [];
       for (const item of noExt) {
         promises.push(Promise.all([
-            this.fs.promises.rename('/' + item.name, '/' + item.name + '.json'),
-            GitHubUtils.rename(item.name, item.name + '.json', this.fs)
+          this.fs.promises.rename('/' + item.name, '/' + item.name + '.json'),
+          GitHubUtils.rename(item.name, item.name + '.json', this.fs)
         ]));
         item.name = item.name + '.json'
         this.series.push(item);
@@ -198,11 +223,11 @@ export default {
         this.selectedSeries = Series.fromJson(JSON.parse(new TextDecoder().decode(value)));
         this.page = this.CHAPTER_MANAGER_PAGE;
       })
-      .catch(() => {
-        this.fileName = name;
-        this.selectedSeries = new Series(name.replace('.json', ''));
-        this.page = this.CHAPTER_MANAGER_PAGE;
-      })
+          .catch(() => {
+            this.fileName = name;
+            this.selectedSeries = new Series(name.replace('.json', ''));
+            this.page = this.CHAPTER_MANAGER_PAGE;
+          })
     },
     discardSeries() {
       this.page = this.SERIES_MANAGER_PAGE;

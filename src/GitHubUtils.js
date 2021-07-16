@@ -2,6 +2,7 @@ import * as GitHub from "github-api";
 import * as git from "isomorphic-git"
 import * as http from "isomorphic-git/http/node"
 import LightningFS from "@isomorphic-git/lightning-fs"
+import Requestable from "github-api/dist/components/Requestable";
 
 // Simple flag for testing
 const DRY_RUN = false;
@@ -137,5 +138,53 @@ export default class GitHubUtils {
       .then(value => {
         return 'https://raw.githubusercontent.com/' + repo + '/' + value + '/' + name;
       })
+  }
+
+  static getTopics(repo, username, pat) {
+    return new RepositoryExtension(repo, {
+      username: username,
+      password: pat
+    }).getTopics(null);
+  }
+
+  static setTopics(topics, repo, username, pat) {
+    return new RepositoryExtension(repo, {
+      username: username,
+      password: pat
+    }).setTopics(topics, null);
+  }
+}
+
+// eslint-disable-next-line no-unused-vars
+class RepositoryExtension extends Requestable {
+  /**
+   * Create a RepositoryExtension.
+   * @param {string} fullname - the full name of the repository
+   * @param {Requestable.auth} [auth] - information required to authenticate to Github
+   */
+  constructor(fullname, auth) {
+    super(auth, null, "mercy-preview");
+    this.__fullname = fullname;
+  }
+
+  /**
+   * Get all repository topics
+   * @see https://docs.github.com/en/rest/reference/repos#get-all-repository-topics
+   * @param {Requestable.callback} cb - will receive the comparison
+   * @return {Promise} - the promise for the http request
+   */
+  getTopics(cb) {
+    return this._request('GET', `/repos/${this.__fullname}/topics`, null, cb);
+  }
+
+  /**
+   * Replace all repository topics
+   * @see https://docs.github.com/en/rest/reference/repos#replace-all-repository-topics
+   * @param {array<string>} topics - An array of topics to add to the repository. Pass one or more topics to replace the set of existing topics. Send an empty array ([]) to clear all topics from the repository. Note: Topic names cannot contain uppercase letters.
+   * @param {Requestable.callback} cb - will receive the comparison
+   * @return {Promise} - the promise for the http request
+   */
+  setTopics(topics, cb) {
+    return this._request('PUT', `/repos/${this.__fullname}/topics`, {names: topics}, cb);
   }
 }
