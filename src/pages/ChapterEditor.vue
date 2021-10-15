@@ -52,7 +52,7 @@
                 </b-field>
                 <b-field grouped>
                   <b-field label="Volume" expanded>
-                    <b-input v-model="chapter.volume"></b-input>
+                    <b-input ref="volume" type="number" v-model="chapter.volume"></b-input>
                   </b-field>
                   <b-field label="Last updated" expanded>
                     <b-datetimepicker
@@ -141,6 +141,9 @@ export default {
       this.$emit('discard');
     },
     save() {
+      if (!this.$refs.volume.isValid) {
+        return;
+      }
       this.chapter.setLastUpdated(this.datetime);
       this.chapter.groups = Groups.getGroups(this.groupName, this.pages, this.isImgur);
       this.$emit('save', this.chapterKey, this.chapter);

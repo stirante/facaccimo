@@ -197,7 +197,8 @@ export default {
         message: `Provide chapter number`,
         inputAttrs: {
           placeholder: 'e.g. 1',
-          value: key + ''
+          value: key + '',
+          type: 'number'
         },
         trapFocus: true,
         onConfirm: (value) => this.editChapter(value)
