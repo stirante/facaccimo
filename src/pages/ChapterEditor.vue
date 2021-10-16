@@ -74,13 +74,16 @@
                   <b-input v-model="groupName"></b-input>
                 </b-field>
                 <b-field>
-                  <b-checkbox v-model="isImgur">
-                    Imgur
+                  <b-checkbox v-model="isProxy">
+                    Proxy
                   </b-checkbox>
                 </b-field>
-                <b-field v-if="isImgur" label="Imgur album ID">
-                  <b-input v-model="pages"></b-input>
-                </b-field>
+                <div v-if="isProxy">
+                  <b-field label="Chapter URL">
+                    <b-input v-model="pages" @input="onProxyUrlChange"></b-input>
+                  </b-field>
+                  Paste MangaDex/MangaSee/Imgur/MangaKatana URL above and it should be automatically turned into <pre style="display: inline; padding: 0.5rem">/proxy/api/</pre> URL
+                </div>
                 <div v-else>
                   <b-field label="List of image URLs">
                     <b-input v-model="pages" type="textarea"></b-input>
@@ -115,6 +118,7 @@ import Chapter from "@/model/Chapter";
 import Groups from "@/model/Groups";
 import Reddit from "@/Reddit";
 import GDrive from "@/GDrive";
+import Proxy from "@/model/Proxy";
 
 export default {
   name: 'ChapterEditor',
@@ -125,7 +129,7 @@ export default {
     return {
       IMPORT_TYPE_REDDIT: 'reddit',
       IMPORT_TYPE_GDRIVE: 'gdrive',
-      isImgur: Groups.isImgur(this.chapter.groups),
+      isProxy: Groups.isProxy(this.chapter.groups),
       pages: Groups.getPages(this.chapter.groups),
       groupName: Groups.getGroupName(this.chapter.groups),
       datetime: this.chapter.getLastUpdated(),
@@ -145,7 +149,7 @@ export default {
         return;
       }
       this.chapter.setLastUpdated(this.datetime);
-      this.chapter.groups = Groups.getGroups(this.groupName, this.pages, this.isImgur);
+      this.chapter.groups = Groups.getGroups(this.groupName, this.pages);
       this.$emit('save', this.chapterKey, this.chapter);
     },
     openRedditDialog() {
@@ -192,6 +196,12 @@ export default {
             });
       } else {
         this.$buefy.toast.open({message: 'URLs are not a valid Reddit Posts!', type: 'is-warning'});
+      }
+    },
+    onProxyUrlChange() {
+      let proxy = Proxy.getProxyByUrl(this.pages);
+      if (proxy) {
+        this.pages = proxy.getProxyUrl(this.pages);
       }
     }
 

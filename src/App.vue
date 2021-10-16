@@ -57,8 +57,8 @@ export default {
       let target = this;
       target.loadingStatus = 'Creating URL';
       target.loading = true;
-      GitHubUtils.getSeriesUrl(fileName, this.repoName, this.fs).then(value => {
-        return GitIO.create(value);
+      GitHubUtils.getCurrentBranch(this.repoName, this.fs).then(value => {
+        return GitIO.create(GitHubUtils.getSeriesUrl(fileName, value, this.repoName, this.fs))
       }).then(value => {
         target.loading = false;
         let url = 'https://cubari.moe/proxy/gist/' + value + '/';
@@ -114,13 +114,13 @@ export default {
         });
       }
     },
-    parseData() {
+    parseData(/*createIndex*/) {
       this.series = [];
       let noExt = [];
       this.fs.readdir('/', {}, (err, files) => {
         let promises = [];
         files.forEach(file => {
-          if (file.endsWith('.json')) {
+          if (file.endsWith('.json') && file !== 'index.json') {
             promises.push(this.fs.promises.readFile('/' + file, {}).then(data => {
               this.loadingStatus = 'Parsing ' + file;
               try {
@@ -150,7 +150,33 @@ export default {
             }))
           }
         });
-        return Promise.all(promises).then(() => {
+        return Promise.all(promises).then(async () => {
+          // if (createIndex) {
+          //   let index = [];
+          //   let branch = await GitHubUtils.getCurrentBranch(this.repoName, this.fs);
+          //   for (const series of this.series) {
+          //     this.loadingStatus = "Getting URL for series " + series.data.title;
+          //     index.push({
+          //       'file': series.name,
+          //       'seriesUrl': 'https://cubari.moe/proxy/gist/' + (await GitIO.create(GitHubUtils.getSeriesUrl(series.name, branch, this.repoName, this.fs))) + '/',
+          //       'title': series.data.title,
+          //       'description': series.data.description,
+          //       'artist': series.data.artist,
+          //       'author': series.data.author,
+          //       'cover': series.data.cover,
+          //       'chapters': Object.keys(series.data.chapters).length,
+          //       'lastChapterIndex': "" + Math.max(...Object.keys(series.data.chapters).map(series => +series)),
+          //       'lastChapter': series.data.chapters["" + Math.max(...Object.keys(series.data.chapters).map(series => +series))]
+          //     })
+          //   }
+          //   this.loadingStatus = "Updating index.json";
+          //   await GitHubUtils.addSeries('index.json', index, this.username, this.pat, this.fs, this.email);
+          //   try {
+          //     await GitHubUtils.createPages(this.username, this.repoName, branch, this.pat);
+          //   } catch (e) {
+          //     console.log(e);
+          //   }
+          // }
           this.loading = false;
           if (noExt.length !== 0) {
             this.$buefy.dialog.confirm({
@@ -237,8 +263,7 @@ export default {
       this.loading = true;
       let target = this;
       GitHubUtils.addSeries(name, series, this.username, this.pat, this.fs, this.email).then(() => {
-        this.parseData();
-        target.loading = false;
+        target.parseData(true);
       });
     },
     goToChapter(key, chapter) {

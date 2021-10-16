@@ -1,38 +1,39 @@
 export default class Groups {
-  static getImgurProxyGroup(groupName, url) {
-    let result = {};
-    let re = /(?:https?:\/\/)?imgur.com\/a\/([a-zA-Z0-9]+)/;
-    let id = url;
-    if (re.test(url)) {
-      id = re.exec(url)[1];
+
+    static getProxyGroup(groupName, url) {
+        let result = {};
+        result[groupName] = url;
+        return result;
     }
-    result[groupName] = '/proxy/api/imgur/chapter/' + id + '/';
-    return result;
-  }
-  static getImagesGroup(groupName, urls) {
-    let result = {};
-    result[groupName] = urls.split('\n');
-    return result;
-  }
-  static getGroups(groupName, pages, isImgur) {
-    if (isImgur) {
-      return this.getImgurProxyGroup(groupName, pages);
-    } else {
-      return this.getImagesGroup(groupName, pages);
+
+    static getImagesGroup(groupName, urls) {
+        let result = {};
+        result[groupName] = urls.split('\n');
+        return result;
     }
-  }
-  static getGroupName(groups) {
-    return Object.keys(groups)[0] ?? '';
-  }
-  static isImgur(groups) {
-    let imgs = groups[this.getGroupName(groups)] ?? [];
-    return typeof imgs === "string";
-  }
-  static getPages(groups) {
-    let imgs = groups[this.getGroupName(groups)] ?? [];
-    if (typeof imgs === "string") {
-      return imgs.replace('/proxy/api/imgur/chapter/', '').replace('/', '') ?? '';
+
+    static getGroups(groupName, pages) {
+        if (typeof pages === "string") {
+            return this.getProxyGroup(groupName, pages);
+        } else {
+            return this.getImagesGroup(groupName, pages);
+        }
     }
-    return imgs.join('\n');
-  }
+
+    static getGroupName(groups) {
+        return Object.keys(groups)[0] ?? '';
+    }
+
+    static isProxy(groups) {
+        return typeof (groups[this.getGroupName(groups)] ?? []) === "string";
+    }
+
+    static getPages(groups) {
+        let imgs = groups[this.getGroupName(groups)] ?? [];
+        if (typeof imgs === "string") {
+            return imgs;
+        }
+        return imgs.join('\n');
+    }
+
 }
