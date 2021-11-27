@@ -12,8 +12,8 @@ export default class Groups {
         return result;
     }
 
-    static getGroups(groupName, pages) {
-        if (typeof pages === "string") {
+    static getGroups(groupName, pages, isProxy) {
+        if (isProxy) {
             return this.getProxyGroup(groupName, pages);
         } else {
             return this.getImagesGroup(groupName, pages);

@@ -149,7 +149,7 @@ export default {
         return;
       }
       this.chapter.setLastUpdated(this.datetime);
-      this.chapter.groups = Groups.getGroups(this.groupName, this.pages);
+      this.chapter.groups = Groups.getGroups(this.groupName, this.pages, this.isProxy);
       this.$emit('save', this.chapterKey, this.chapter);
     },
     openRedditDialog() {
