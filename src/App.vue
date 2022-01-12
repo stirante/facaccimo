@@ -42,7 +42,6 @@ import ChapterManager from "@/pages/ChapterManager";
 import GitHubUtils from "@/GitHubUtils";
 import Series from "@/model/Series";
 import ChapterEditor from "@/pages/ChapterEditor";
-import GitIO from "@/GitIO";
 
 export default {
   name: 'App',
@@ -58,7 +57,9 @@ export default {
       target.loadingStatus = 'Creating URL';
       target.loading = true;
       GitHubUtils.getCurrentBranch(this.repoName, this.fs).then(value => {
-        return GitIO.create(GitHubUtils.getSeriesUrl(fileName, value, this.repoName, this.fs))
+        return GitHubUtils.getBase64EncodedSlug(
+          GitHubUtils.getSeriesUrl(fileName, value, this.repoName, this.fs)
+        );
       }).then(value => {
         target.loading = false;
         let url = 'https://cubari.moe/proxy/gist/' + value + '/';
