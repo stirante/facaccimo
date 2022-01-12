@@ -148,6 +148,15 @@ export default class GitHubUtils {
         return 'https://raw.githubusercontent.com/' + repo + '/' + branch + '/' + name;
     }
 
+    static getBase64EncodedSlug(rawGithubUrl) {
+        const url = new URL(rawGithubUrl);
+        // Base64 URL-encoded with no padding
+        return btoa(url.host.split(".")[0] + url.pathname)
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=/g, "");
+    }
+
     static getTopics(repo, username, pat) {
         return new RepositoryExtension(repo, {
             username: username,
