@@ -198,7 +198,8 @@ export default {
         inputAttrs: {
           placeholder: 'e.g. 1',
           value: key + '',
-          type: 'number'
+          type: 'number',
+          step: "any"
         },
         trapFocus: true,
         onConfirm: (value) => this.editChapter(value)
