@@ -53,8 +53,8 @@ export default class GitHubUtils {
             fs: fs,
             http: http,
             dir: '/',
-            url: 'https://github.com/' + fullName,
-            corsProxy: 'https://cors.isomorphic-git.org'
+            corsProxy: 'https://cors.stirante.com',
+            url: 'https://github.com/' + fullName
         })
             .then(() => {
                 return fs;
@@ -88,6 +88,7 @@ export default class GitHubUtils {
                         fs: fs,
                         dir: '/',
                         http: http,
+                        corsProxy: 'https://cors.stirante.com',
                         onAuth: () => ({username: username, password: pat})
                     });
                 });
