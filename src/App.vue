@@ -265,6 +265,10 @@ export default {
       let target = this;
       GitHubUtils.addSeries(name, series, this.username, this.pat, this.fs, this.email).then(() => {
         target.parseData(true);
+      }).catch(e => {
+        console.log(e);
+        target.loading = false;
+        this.$buefy.toast.open({message: 'Error saving series!' + (e.data ? '\n' + e.data.response : ''), type: 'is-danger', duration: 5000})
       });
     },
     goToChapter(key, chapter) {
