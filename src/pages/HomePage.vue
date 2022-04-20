@@ -206,7 +206,23 @@ export default {
       this.actionType = this.ACTION_NEXT;
     },
     goToManager() {
-      this.$emit('finished', {pat: this.pat, username: this.username, repoName: this.repoName, email: this.email});
+      GitHubUtils.createGH(this.username, this.pat).getUser().getProfile().then(() => {
+        this.$emit('finished', {pat: this.pat, username: this.username, repoName: this.repoName, email: this.email});
+      }).catch(err => {
+        this.$buefy.dialog.prompt({
+          message: `The token you provided is not valid or has expired. Please provide a valid token. You can check them <a href="https://github.com/settings/tokens" target="_blank">here</a>`,
+          closeOnConfirm: false,
+          trapFocus: true,
+          canCancel: false,
+          onConfirm: (value, {close}) => {
+            this.pat = value;
+            window.localStorage.setItem('pat', this.pat);
+            close();
+            this.$emit('finished', {pat: this.pat, username: this.username, repoName: this.repoName, email: this.email});
+          }
+        });
+        console.log(err);
+      });
     }
   },
   props: {}
