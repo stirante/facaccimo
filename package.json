@@ -11,7 +11,7 @@
     "@isomorphic-git/lightning-fs": "^4.6.0",
     "buefy": "^0.9.6",
     "bulmaswatch": "^0.8.1",
-    "core-js": "^3.6.5",
+    "core-js": "^3.22.7",
     "github-api": "^3.4.0",
     "isomorphic-git": "^1.8.2",
     "vue": "^2.6.14"
