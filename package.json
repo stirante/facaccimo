@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@isomorphic-git/lightning-fs": "^4.6.0",
-    "buefy": "^0.9.6",
+    "buefy": "^0.9.21",
     "bulmaswatch": "^0.8.1",
     "core-js": "^3.6.5",
     "github-api": "^3.4.0",
