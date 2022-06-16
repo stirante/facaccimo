@@ -13,7 +13,7 @@
     "bulmaswatch": "^0.8.1",
     "core-js": "^3.22.8",
     "github-api": "^3.4.0",
-    "isomorphic-git": "^1.17.3",
+    "isomorphic-git": "^1.18.3",
     "vue": "^2.6.14"
   },
   "devDependencies": {
