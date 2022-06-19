@@ -3,6 +3,7 @@ import * as git from "isomorphic-git"
 import * as http from "isomorphic-git/http/node"
 import LightningFS from "@isomorphic-git/lightning-fs"
 import Requestable from "github-api/dist/components/Requestable";
+import CorsProxy from "./CorsProxy";
 
 // Simple flag for testing
 const DRY_RUN = false;
@@ -53,7 +54,7 @@ export default class GitHubUtils {
             fs: fs,
             http: http,
             dir: '/',
-            corsProxy: 'https://cors.stirante.com',
+            corsProxy: CorsProxy.URL,
             url: 'https://github.com/' + fullName
         })
             .then(() => {
@@ -88,7 +89,7 @@ export default class GitHubUtils {
                         fs: fs,
                         dir: '/',
                         http: http,
-                        corsProxy: 'https://cors.stirante.com',
+                        corsProxy: CorsProxy.URL,
                         onAuth: () => ({username: username, password: pat})
                     });
                 });

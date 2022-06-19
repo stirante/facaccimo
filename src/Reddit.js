@@ -1,3 +1,5 @@
+import CorsProxy from "./CorsProxy";
+
 const URL_REGEX = /(?:https?:\/\/)?(?:www\.)?reddit\.com\/r\/[a-z]+\/comments\/[a-z0-9]+\/[a-z0-9_]+\/?/;
 
 export default class Reddit {
@@ -17,7 +19,9 @@ export default class Reddit {
       if (!u.toLowerCase().startsWith('http')) {
         u = "https://" + u;
       }
-      promises.push(fetch("https://cors.stirante.com/" + u + ".json").then(value => {
+      promises.push(CorsProxy.get(u + ".json", {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'
+      }).then(value => {
         return value.text();
       }).then(value => {
         let data = JSON.parse(value);
