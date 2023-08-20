@@ -21,12 +21,12 @@ export default class GitHubUtils {
         return gh.getUser().listRepos();
     }
 
-  static createPages(username, repo, branch, pat) {
-    return new RepositoryExtension(repo, {
-      username: username,
-      password: pat
-    }).createPages(branch, null, null);
-  }
+    static createPages(username, repo, branch, pat) {
+        return new RepositoryExtension(repo, {
+            username: username,
+            password: pat
+        }).createPages(branch, null, null);
+    }
 
     static getEmail(username, pat) {
         let gh = this.createGH(username, pat);
@@ -49,12 +49,12 @@ export default class GitHubUtils {
     }
 
     static cloneRepo(fullName) {
-        const fs = new LightningFS('fs', {wipe: true});
+        const fs = new LightningFS('fs', { wipe: true });
         return git.clone({
             fs: fs,
             http: http,
             dir: '/',
-            corsProxy: CorsProxy.URL,
+            corsProxy: !window.isElectron ? CorsProxy.URL : undefined,
             url: 'https://github.com/' + fullName
         })
             .then(() => {
@@ -89,8 +89,8 @@ export default class GitHubUtils {
                         fs: fs,
                         dir: '/',
                         http: http,
-                        corsProxy: CorsProxy.URL,
-                        onAuth: () => ({username: username, password: pat})
+                        corsProxy: !window.isElectron ? CorsProxy.URL : undefined,
+                        onAuth: () => ({ username: username, password: pat })
                     });
                 });
         }
@@ -204,18 +204,18 @@ class RepositoryExtension extends Requestable {
      * @return {Promise} - the promise for the http request
      */
     setTopics(topics, cb) {
-        return this._request('PUT', `/repos/${this.__fullname}/topics`, {names: topics}, cb);
+        return this._request('PUT', `/repos/${this.__fullname}/topics`, { names: topics }, cb);
     }
 
-  /**
-   * Configures a GitHub Pages site
-   * @see https://docs.github.com/en/rest/reference/repos#create-a-github-pages-site
-   * @param {string} branch - The repository branch used to publish your site's source files
-   * @param {string|null} path - The repository directory that includes the source files for the Pages site
-   * @param {Requestable.callback} cb - will receive the comparison
-   * @return {Promise} - the promise for the http request
-   */
-  createPages(branch, path, cb) {
-    return this._request('POST', `/repos/${this.__fullname}/pages`, {source: {branch: branch, path: path ?? '/'}}, cb);
-  }
+    /**
+     * Configures a GitHub Pages site
+     * @see https://docs.github.com/en/rest/reference/repos#create-a-github-pages-site
+     * @param {string} branch - The repository branch used to publish your site's source files
+     * @param {string|null} path - The repository directory that includes the source files for the Pages site
+     * @param {Requestable.callback} cb - will receive the comparison
+     * @return {Promise} - the promise for the http request
+     */
+    createPages(branch, path, cb) {
+        return this._request('POST', `/repos/${this.__fullname}/pages`, { source: { branch: branch, path: path ?? '/' } }, cb);
+    }
 }
