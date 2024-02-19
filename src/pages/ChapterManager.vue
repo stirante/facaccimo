@@ -111,6 +111,16 @@
 
                 <template #footer>
                   <div class="has-text-right">
+                    <b-dropdown aria-role="list">
+                      <template #trigger="{ active }">
+                        <b-button
+                            label="Fixes"
+                            type="is-primary"
+                            icon-pack="fas"
+                            :icon-right="active ? 'caret-up' : 'caret-down'"/>
+                      </template>
+                      <b-dropdown-item aria-role="listitem" @click="fixOldGDriveUrls">Fix Google Drive links</b-dropdown-item>
+                    </b-dropdown>
                   </div>
                 </template>
 
@@ -131,6 +141,7 @@ import {BButton} from "buefy/src/components/button";
 import Vue from "vue";
 import Chapter from "@/model/Chapter";
 import Groups from "@/model/Groups";
+import GDrive from "@/GDrive";
 
 export default {
   name: 'ChapterManager',
@@ -210,6 +221,34 @@ export default {
     },
     save() {
       this.$emit('save', this.name, this.series);
+    },
+    fixOldGDriveUrls() {
+      let target = this;
+      this.$buefy.dialog.confirm({
+        title: 'Fixing Google Drive links',
+        message: 'Are you sure you want to fix all Google Drive links?',
+        confirmText: 'Fix',
+        type: 'is-danger',
+        hasIcon: true,
+        onConfirm: () => {
+          let counter = 0;
+          let keys = Object.keys(target.series.chapters);
+          keys.forEach(e => {
+            let chapter = target.series.chapters[e];
+            let groups = Object.keys(chapter.groups);
+            for (let i = 0; i < groups.length; i++) {
+              let group = chapter.groups[groups[i]];
+              for (let j = 0; j < group.length; j++) {
+                if (GDrive.isOldGDriveUrl(group[j])) {
+                  group[j] = GDrive.updateOldUrl(group[j]);
+                  counter++;
+                }
+              }
+            }
+          });
+          target.$buefy.toast.open(counter + ' old Google Drive links fixed!');
+        }
+      })
     }
   },
   props: {
