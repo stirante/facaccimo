@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "serve": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve",
+    "build": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
+    "lint": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service lint"
   },
   "dependencies": {
     "@isomorphic-git/lightning-fs": "^4.6.0",
-    "buefy": "^0.9.21",
+    "buefy": "^0.9.28",
     "bulmaswatch": "^0.8.1",
     "core-js": "^3.22.8",
     "github-api": "^3.4.0",

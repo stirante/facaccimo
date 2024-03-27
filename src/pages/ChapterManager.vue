@@ -63,20 +63,21 @@
                           icon-left="plus">Add new chapter
                 </b-button>
               </div>
-              <b-table :data="Object.keys(series.chapters)"
+              <b-table :data="sortedChapters"
                        paginated
                        :per-page="10"
                        :current-page.sync="currentPage"
                        :checked-rows.sync="checkedRows"
                        pagination-simple
                        default-sort="name"
+                       default-sort-dir="desc"
                        icon-pack="fas"
                        hoverable
                        checkable
                        checkbox-position="left"
               >
 
-                <b-table-column field="name" label="Chapter number" v-slot="props" sortable>
+                <b-table-column field="name" label="Chapter number" v-slot="props" sortable custom-sort="compareChapterNames">
                   {{ props.row }}
                 </b-table-column>
 
@@ -155,6 +156,11 @@ export default {
       checkedRows: []
     }
   },
+  computed: {
+    sortedChapters() {
+      return Object.keys(this.series.chapters).sort(this.compareChapterNames);
+    }
+  },
   methods: {
     groupEdit() {
       let target = this;
@@ -197,7 +203,7 @@ export default {
     },
     addNewChapter() {
       let key = '';
-      let keys = Object.keys(this.series.chapters);
+      let keys = this.sortedChapters;
       if (keys.length > 0) {
         let lastKey = keys[keys.length - 1];
         if (!isNaN(+lastKey)) {
@@ -249,6 +255,15 @@ export default {
           target.$buefy.toast.open(counter + ' old Google Drive links fixed!');
         }
       })
+    },
+    compareChapterNames(a, b, isAsc = false) {
+      if (a === b || isNaN(+a) || isNaN(+b)) {
+        return 0;
+      }
+      if (isAsc) {
+        return (+a) - (+b);
+      }
+      return (+b) - (+a);
     }
   },
   props: {
