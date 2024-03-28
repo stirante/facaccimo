@@ -205,7 +205,7 @@ export default {
       let key = '';
       let keys = this.sortedChapters;
       if (keys.length > 0) {
-        let lastKey = keys[keys.length - 1];
+        let lastKey = keys[0];
         if (!isNaN(+lastKey)) {
           key = +lastKey + 1;
         }
