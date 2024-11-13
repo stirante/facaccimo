@@ -112,11 +112,16 @@ export default {
       } else {
         target.loading = true;
         target.loadingStatus = 'Cloning repo';
-        GitHubUtils.cloneRepo(this.repoName).then(value => {
-          target.fs = value;
-          target.loadingStatus = 'Parsing data';
-          target.parseData();
-        });
+        GitHubUtils.cloneRepo(this.repoName)
+          .then(value => {
+            target.fs = value;
+            target.loadingStatus = 'Parsing data';
+            target.parseData();
+          }).catch((err) => {
+            target.loading = false;
+            target.loadingStatus = '';
+            this.$buefy.toast.open({message: 'Failed to clone repo!\n' + err.message, type: 'is-danger'});
+          });
       }
     },
     parseData(/*createIndex*/) {
