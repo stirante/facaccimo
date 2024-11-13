@@ -4,11 +4,12 @@ export default class Proxy {
         new Proxy('mangadex', 'MangaDex', /^https:\/\/mangadex.org\/chapter\/([\d\w-]+)\/?$/),
         new Proxy('imgur', 'Imgur', /^https:\/\/imgur.com\/(?:a|gallery)\/([\d\w]+)\/?$/),
         new Proxy('mangasee', 'MangaSee', /^https:\/\/mangasee123.com\/read-online\/([\d\w-]+)-page-[\d]+\.html$/),
-        new Proxy('mangakatana', 'MangaKatana', /^https:\/\/mangakatana.com\/manga\/([\d\w-.]+)\/c([\d]+)\/?$/, function (name, exec) {
+        new Proxy('mangakatana', 'MangaKatana', /^https:\/\/mangakatana.com\/manga\/([\d\w-.]+)\/c(\d+)\/?$/, function (name, exec) {
             return '/proxy/api/' + name + '/chapter/' + btoa(exec[0]) + '/';
-        })
+        }),
+        new Proxy('dynasty', 'Dynasty Scans', /^https:\/\/dynasty-scans.com\/chapters\/([\d\w_]+_ch[\d]+)$/),
     ]
-    static PROXY_REGEX = /^\/proxy\/api\/([\w]+)\/chapter\/([\d\w-=]+)\/?/
+    static PROXY_REGEX = /^\/proxy\/api\/(\w+)\/chapter\/([\d\w-=]+)\/?/
     _name;
     _niceName;
     urlRegex;
