@@ -99,7 +99,11 @@ export default {
                 target.fs = value;
                 target.loadingStatus = 'Parsing data';
                 target.parseData();
-              });
+              }).catch((err) => {
+                target.loading = false;
+                target.loadingStatus = '';
+                this.$buefy.toast.open({message: 'Failed to clone repo!\n' + err.message, type: 'is-danger'});
+              })
             } else {
               this.$buefy.toast.open({message: 'Invalid email!', type: 'is-danger'});
             }

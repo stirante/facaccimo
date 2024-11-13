@@ -9,7 +9,7 @@
                 static and the code is
                 open source.</p>
               <p>The source code is available on <a href="https://github.com/stirante/facaccimo">GitHub</a>.</p>
-              <p>Additionally you can contact me on Discord (stirante#0001) or Reddit (u/stiranteee).</p>
+              <p>Additionally you can contact me on Discord (stirante).</p>
             </div>
             <p v-if="step === 1">Do you have a GitHub account?</p>
             <p v-if="step === 2">Create an account <a href="https://github.com/" target="_blank">here</a></p>
