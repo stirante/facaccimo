@@ -4,62 +4,63 @@
       <div class="card">
         <div class="card-content">
           <div class="content">
-            <b-table :data="series"
-                     default-sort="name"
-                     :sort-icon="sortIcon"
-                     hoverable
-                     :sort-icon-size="sortIconSize">
-
-              <b-table-column field="name" label="File name" v-slot="props" sortable>
-                {{ props.row.name }}
-              </b-table-column>
-
-              <b-table-column field="title" label="Title" v-slot="props" sortable>
-                {{ props.row.data.title }}
-              </b-table-column>
-
-              <b-table-column field="chapters" label="Chapters" v-slot="props" sortable>
-                {{ Object.keys(props.row.data.chapters).length }}
-              </b-table-column>
-
-              <b-table-column field="last_chapter" label="Last Chapter" v-slot="props" sortable>
-                {{
-                  Object.keys(props.row.data.chapters).length !== 0 ? props.row.data.chapters[Object.keys(props.row.data.chapters)[Object.keys(props.row.data.chapters).length - 1]].title : 'N/A'
-                }}
-              </b-table-column>
-
-              <b-table-column field="actions" label="Actions" v-slot="props">
-                <div class="buttons">
-                  <b-button type="is-primary"
-                            @click="showUrl(props.row.name)"
-                            icon-pack="fas"
-                            icon-right="link"/>
-                  <b-button type="is-primary"
-                            @click="goToSeries(props.row.name)"
-                            icon-pack="fas"
-                            icon-right="pen"/>
-                  <b-button type="is-danger"
-                            @click="confirmDelete(props.row.name)"
-                            icon-pack="fas"
-                            icon-right="trash"/>
-                </div>
-              </b-table-column>
-
-              <template #empty>
-                <div class="has-text-centered">No files</div>
-              </template>
-
-              <template #footer>
-                <div class="has-text-right">
-                  <b-button type="is-primary"
-                            @click="addNewSeries()"
-                            icon-pack="fas"
-                            icon-left="plus">Add new series
-                  </b-button>
-                </div>
-              </template>
-
-            </b-table>
+            <table>
+              <thead>
+                <tr>
+                  <th>File name</th>
+                  <th>Title</th>
+                  <th>Chapters</th>
+                  <th>Last Chapter</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="series in series" :key="series.name">
+                  <td>{{ series.name }}</td>
+                  <td>{{ series.data.title }}</td>
+                  <td>{{ Object.keys(series.data.chapters).length }}</td>
+                  <td>
+                    {{ Object.keys(series.data.chapters).length !== 0
+                      ? series.data.chapters[
+                          Object.keys(series.data.chapters)[
+                            Object.keys(series.data.chapters).length - 1
+                          ]
+                        ].title
+                      : "N/A" }}
+                  </td>
+                  <td>
+                    <div class="buttons">
+                      <b-button
+                        type="is-primary"
+                        @click="showUrl(series.name)"
+                        icon-pack="fas"
+                        icon-right="link"
+                      />
+                      <b-button
+                        type="is-primary"
+                        @click="goToSeries(series.name)"
+                        icon-pack="fas"
+                        icon-right="pen"
+                      />
+                      <b-button
+                        type="is-danger"
+                        @click="confirmDelete(series.name)"
+                        icon-pack="fas"
+                        icon-right="trash"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-if="series.length === 0" class="has-text-centered">No files</div>
+            <div class="has-text-right">
+              <b-button type="is-primary"
+                        @click="addNewSeries()"
+                        icon-pack="fas"
+                        icon-left="plus">Add new series
+              </b-button>
+            </div>
           </div>
         </div>
       </div>
@@ -68,62 +69,56 @@
 </template>
 
 <script>
-
-import {BTable} from "buefy/src/components/table";
-import {BButton} from "buefy/src/components/button";
+import { BButton } from "buefy/src/components/button";
 
 export default {
-  name: 'SeriesManager',
+  name: "SeriesManager",
   components: {
-    BTable,
-    BButton
+    BButton,
   },
-  data: function () {
+  data: function() {
     return {
-      sortIcon: 'arrow-up',
-      sortIconSize: 'is-small',
-    }
+      sortIcon: "arrow-up",
+      sortIconSize: "is-small",
+    };
   },
   computed: {},
-  beforeMount() {
-  },
+  beforeMount() {},
   methods: {
     confirmDelete(fileName) {
       this.$buefy.dialog.confirm({
-        title: 'Deleting ' + fileName,
-        message: 'Are you sure you want to <b>delete</b> this series?',
-        confirmText: 'Delete',
-        type: 'is-danger',
+        title: "Deleting " + fileName,
+        message: "Are you sure you want to <b>delete</b> this series?",
+        confirmText: "Delete",
+        type: "is-danger",
         hasIcon: true,
-        onConfirm: () => this.$emit('delete', fileName)
-      })
+        onConfirm: () => this.$emit("delete", fileName),
+      });
     },
     showUrl(fileName) {
-      this.$emit('show', fileName);
+      this.$emit("show", fileName);
     },
     addNewSeries() {
       this.$buefy.dialog.prompt({
         message: `Provide file name`,
         inputAttrs: {
-          placeholder: 'e.g. MangaName.json'
+          placeholder: "e.g. MangaName.json",
         },
         trapFocus: true,
-        onConfirm: (value) => this.goToSeries(value)
-      })
+        onConfirm: (value) => this.goToSeries(value),
+      });
     },
     goToSeries(name) {
-      if (!name.toLowerCase().endsWith('.json')) {
-        name = name + '.json';
+      if (!name.toLowerCase().endsWith(".json")) {
+        name = name + ".json";
       }
-      this.$emit('series', name);
-    }
+      this.$emit("series", name);
+    },
   },
   props: {
-    series: Array
-  }
-}
+    series: Array,
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

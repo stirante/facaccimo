@@ -63,69 +63,53 @@
                           icon-left="plus">Add new chapter
                 </b-button>
               </div>
-              <b-table :data="sortedChapters"
-                       paginated
-                       :per-page="10"
-                       :current-page.sync="currentPage"
-                       :checked-rows.sync="checkedRows"
-                       pagination-simple
-                       default-sort="name"
-                       default-sort-dir="desc"
-                       icon-pack="fas"
-                       hoverable
-                       checkable
-                       checkbox-position="left"
-              >
-
-                <b-table-column field="name" label="Chapter number" v-slot="props" sortable custom-sort="compareChapterNames">
-                  {{ props.row }}
-                </b-table-column>
-
-                <b-table-column field="title" label="Title" v-slot="props" sortable>
-                  {{ series.chapters[props.row].title }}
-                </b-table-column>
-
-                <b-table-column field="volume" label="Volume" v-slot="props" sortable>
-                  {{ series.chapters[props.row].volume }}
-                </b-table-column>
-
-                <b-table-column field="updated" label="Last updated" v-slot="props" sortable>
-                  {{ new Date(series.chapters[props.row].getLastUpdated()).toLocaleDateString() }}
-                </b-table-column>
-
-                <b-table-column field="actions" label="Actions" v-slot="props">
-                  <div class="buttons">
-                    <b-button type="is-primary"
-                              @click="editChapter(props.row)"
-                              icon-pack="fas"
-                              icon-right="pen"/>
-                    <b-button type="is-danger"
-                              @click="confirmDelete(props.row)"
-                              icon-pack="fas"
-                              icon-right="trash"/>
-                  </div>
-                </b-table-column>
-
-                <template #empty>
-                  <div class="has-text-centered">No chapters</div>
-                </template>
-
-                <template #footer>
-                  <div class="has-text-right">
-                    <b-dropdown aria-role="list">
-                      <template #trigger="{ active }">
-                        <b-button
-                            label="Fixes"
-                            type="is-primary"
-                            icon-pack="fas"
-                            :icon-right="active ? 'caret-up' : 'caret-down'"/>
-                      </template>
-                      <b-dropdown-item aria-role="listitem" @click="fixOldGDriveUrls">Fix Google Drive links</b-dropdown-item>
-                    </b-dropdown>
-                  </div>
-                </template>
-
-              </b-table>
+            <table>
+              <thead>
+                <tr>
+                  <th>Chapter number</th>
+                  <th>Title</th>
+                  <th>Volume</th>
+                  <th>Last updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="chapter in sortedChapters" :key="chapter.name">
+                  <td>{{ chapter }}</td>
+                  <td>{{ series.chapters[chapter].title }}</td>
+                  <td>{{ series.chapters[chapter].volume }}</td>
+                  <td>{{ ''+new Date(series.chapters[chapter].getLastUpdated()).toLocaleDateString() }}</td>
+                  <td>
+                    <div class="buttons">
+                      <b-button type="is-primary"
+                                @click="editChapter(chapter)"
+                                icon-pack="fas"
+                                icon-right="pen"/>
+                      <b-button type="is-danger"
+                                @click="confirmDelete(chapter)"
+                                icon-pack="fas"
+                                icon-right="trash"/>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+              <div v-if="sortedChapters.length === 0" class="has-text-centered">No chapters</div>
+              <div class="has-text-right">
+                <b-button type="is-primary"
+                          :disabled="checkedRows.length === 0"
+                          @click="groupEdit()"
+                          icon-pack="fas"
+                          class="m-1"
+                          icon-left="pen">Group edit volume
+                </b-button>
+                <b-button type="is-primary"
+                          @click="addNewChapter()"
+                          icon-pack="fas"
+                          class="m-1"
+                          icon-left="plus">Add new chapter
+                </b-button>
+              </div>
             </div>
           </div>
         </div>
@@ -137,7 +121,6 @@
 <script>
 
 import Series from "@/model/Series";
-import {BTable} from "buefy/src/components/table";
 import {BButton} from "buefy/src/components/button";
 import Vue from "vue";
 import Chapter from "@/model/Chapter";
@@ -147,7 +130,6 @@ import GDrive from "@/GDrive";
 export default {
   name: 'ChapterManager',
   components: {
-    BTable,
     BButton
   },
   data: function () {
