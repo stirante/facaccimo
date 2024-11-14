@@ -54,12 +54,41 @@ export default class GitHubUtils {
             fs: fs,
             http: http,
             dir: '/',
-            corsProxy: !window.isElectron ? CorsProxy.URL : undefined,
+            corsProxy: CorsProxy.getProxyUrl(),
             url: 'https://github.com/' + fullName
         })
             .then(() => {
                 return fs;
-            });
+            })
+            .catch((err) => {
+                if (err.message.indexOf('Could not find HEAD') !== -1) {
+                    return git.init({
+                        fs: fs,
+                        dir: '/',
+                        defaultBranch: 'main'
+                    })
+                        .then(() => {
+                            return git.addRemote({
+                                fs: fs,
+                                dir: '/',
+                                remote: 'origin',
+                                url: 'https://github.com/' + fullName
+                            })
+                        })
+                        .then(() => {
+                            return git.branch({
+                                fs: fs,
+                                dir: '/',
+                                ref: 'main'
+                            })
+                        })
+                        .then(() => {
+                            return fs;
+                        })
+                } else {
+                    throw err;
+                }
+            })
     }
 
     static commit(promise, fs, message, email) {
@@ -89,7 +118,7 @@ export default class GitHubUtils {
                         fs: fs,
                         dir: '/',
                         http: http,
-                        corsProxy: !window.isElectron ? CorsProxy.URL : undefined,
+                        corsProxy: CorsProxy.getProxyUrl(),
                         onAuth: () => ({ username: username, password: pat })
                     });
                 });
