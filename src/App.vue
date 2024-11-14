@@ -42,6 +42,7 @@ import ChapterManager from "@/pages/ChapterManager";
 import GitHubUtils from "@/GitHubUtils";
 import Series from "@/model/Series";
 import ChapterEditor from "@/pages/ChapterEditor";
+import CorsProxy from "./CorsProxy";
 
 export default {
   name: 'App',
@@ -100,6 +101,7 @@ export default {
                 target.loadingStatus = 'Parsing data';
                 target.parseData();
               }).catch((err) => {
+                console.error(err);
                 target.loading = false;
                 target.loadingStatus = '';
                 this.$buefy.toast.open({message: 'Failed to clone repo!\n' + err.message, type: 'is-danger'});
@@ -118,6 +120,7 @@ export default {
             target.loadingStatus = 'Parsing data';
             target.parseData();
           }).catch((err) => {
+            console.error(err);
             target.loading = false;
             target.loadingStatus = '';
             this.$buefy.toast.open({message: 'Failed to clone repo!\n' + err.message, type: 'is-danger'});
@@ -301,6 +304,22 @@ export default {
     }
   },
   mounted() {
+    if (process.env.NODE_ENV === 'development') {
+      document.title = 'facaccimo (dev)';
+    }
+    CorsProxy.isAvailable().then(value => {
+      if (!value) {
+        this.$buefy.dialog.confirm({
+          title: 'CORS proxy not available',
+          message: 'CORS proxy is not available. Start it to continue the development.',
+          confirmText: 'OK',
+          type: 'is-primary',
+          hasIcon: true
+        });
+      } else if (process.env.NODE_ENV === 'development') {
+        this.$buefy.toast.open({message: 'CORS proxy is available', type: 'is-success'});
+      }
+    });
   },
   data: function () {
     return {

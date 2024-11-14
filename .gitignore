@@ -3,6 +3,8 @@ node_modules
 /dist
 
 *.sh
+*.pid
+/cors-buster
 
 # local env files
 .env.local
