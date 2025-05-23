@@ -29,7 +29,7 @@
                       : "N/A" }}
                   </td>
                   <td>
-                    <div class="buttons">
+                    <div class="buttons" style="flex-wrap: nowrap;">
                       <b-button
                         type="is-primary"
                         @click="showUrl(series.name)"
