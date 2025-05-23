@@ -3,7 +3,7 @@ export default class Proxy {
     static PROXIES = [
         new Proxy('mangadex', 'MangaDex', /^https:\/\/mangadex.org\/chapter\/([\d\w-]+)\/?$/),
         new Proxy('imgur', 'Imgur', /^https:\/\/imgur.com\/(?:a|gallery)\/([-\d\w]+)\/?$/),
-        new Proxy('imgchest', 'Imgchest', /^https:\/\/imgchest.com\/p\/([-\d\w]+)\/?$/),
+        new Proxy('imgchest', 'Image Chest', /^https:\/\/imgchest.com\/p\/([-\d\w]+)\/?$/),
         new Proxy('mangasee', 'MangaSee', /^https:\/\/mangasee123.com\/read-online\/([\d\w-]+)-page-[\d]+\.html$/),
         new Proxy('mangakatana', 'MangaKatana', /^https:\/\/mangakatana.com\/manga\/([\d\w-.]+)\/c(\d+)\/?$/, function (name, exec) {
             return '/proxy/api/' + name + '/chapter/' + btoa(exec[0]) + '/';
