@@ -9,6 +9,7 @@ export default class Proxy {
             return '/proxy/api/' + name + '/chapter/' + btoa(exec[0]) + '/';
         }),
         new Proxy('dynasty', 'Dynasty Scans', /^https:\/\/dynasty-scans.com\/chapters\/([\d\w_]+_ch[\d]+)$/),
+        new Proxy('catbox', 'Catbox', /^https:\/\/catbox.moe\/c\/([\d\w-]+)\/?$/),
     ]
     static PROXY_REGEX = /^\/proxy\/api\/(\w+)\/chapter\/([\d\w-=]+)\/?/
     _name;
