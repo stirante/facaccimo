@@ -21,6 +21,10 @@
               Paste URL to Google Drive shared image
               <p class="is-italic">You can include multiple images by pasting multiple URLs in separate lines</p>
             </div>
+            <div v-else-if="importType === IMPORT_TYPE_IMGUR">
+              Paste URL to Imgur album
+              <p class="is-italic">You can include multiple albums by pasting multiple URLs in separate lines</p>
+            </div>
             <b-field>
               <b-input v-model="importContent" type="textarea"></b-input>
             </b-field>
@@ -99,6 +103,7 @@
                       </template>
                       <b-dropdown-item aria-role="listitem" @click="openRedditDialog">Reddit Gallery</b-dropdown-item>
                       <b-dropdown-item aria-role="listitem" @click="openGDriveDialog">Google Drive</b-dropdown-item>
+                      <b-dropdown-item aria-role="listitem" @click="openImgurDialog">Imgur Album</b-dropdown-item>
                     </b-dropdown>
                   </div>
                 </div>
@@ -118,6 +123,7 @@ import Chapter from "@/model/Chapter";
 import Groups from "@/model/Groups";
 import Reddit from "@/Reddit";
 import GDrive from "@/GDrive";
+import Imgur from "@/Imgur";
 import Proxy from "@/model/Proxy";
 
 export default {
@@ -129,6 +135,7 @@ export default {
     return {
       IMPORT_TYPE_REDDIT: 'reddit',
       IMPORT_TYPE_GDRIVE: 'gdrive',
+      IMPORT_TYPE_IMGUR: 'imgur',
       isProxy: Groups.isProxy(this.chapter.groups),
       pages: Groups.getPages(this.chapter.groups),
       groupName: Groups.getGroupName(this.chapter.groups),
@@ -162,11 +169,18 @@ export default {
       this.importContent = '';
       this.isImporting = true;
     },
+    openImgurDialog() {
+      this.importType = this.IMPORT_TYPE_IMGUR;
+      this.importContent = '';
+      this.isImporting = true;
+    },
     finishImport(close) {
       if (this.importType === this.IMPORT_TYPE_REDDIT) {
         this.parseReddit(this.importContent, close);
       } else if (this.importType === this.IMPORT_TYPE_GDRIVE) {
         this.parseGDrive(this.importContent, close);
+      } else if (this.importType === this.IMPORT_TYPE_IMGUR) {
+        this.parseImgur(this.importContent, close);
       }
     },
     parseGDrive(urls, close) {
@@ -196,6 +210,26 @@ export default {
             });
       } else {
         this.$buefy.toast.open({message: 'URLs are not a valid Reddit Posts!', type: 'is-warning'});
+      }
+    },
+    parseImgur(urls, close) {
+      if (Imgur.isImgurUrl(urls)) {
+        close();
+        this.isImporting = false;
+        this.$emit('loading', 'Getting data from Imgur');
+        Imgur.getImgArray(urls).then(value => {
+          this.pages += (this.pages.length === 0 ? '' : '\n') + value.join('\n');
+          this.$emit('loaded');
+        })
+            .catch(() => {
+              this.$emit('loaded');
+              this.$buefy.toast.open({
+                message: 'Failed to get images from Imgur! You can use the imgur proxy instead.',
+                type: 'is-danger'
+              });
+            });
+      } else {
+        this.$buefy.toast.open({message: 'URLs are not a valid Imgur albums!', type: 'is-warning'});
       }
     },
     onProxyUrlChange() {

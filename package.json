@@ -7,7 +7,7 @@
     "build": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
     "lint": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service lint",
     "start": "npm run build && cd desktop-wrapper && npm run start",
-    "proxy": "SET 'ALLOW_ORIGIN=*' && cors-proxy start"
+    "proxy": "node dev-cors-proxy.js"
   },
   "dependencies": {
     "@isomorphic-git/lightning-fs": "^4.6.0",
